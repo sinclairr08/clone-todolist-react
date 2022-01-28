@@ -1,6 +1,32 @@
 import React from "react";
 import { useSetRecoilState } from "recoil";
+import styled from "styled-components";
 import { Categories, IToDo, toDoState } from "../atoms";
+
+const ToDoContatiner = styled.li`
+  display: flex;
+  align-items: center;
+  margin: 5px 8px;
+`;
+
+const ToDoText = styled.span`
+  font-size: 24px;
+  margin-right: 10px;
+`;
+
+const ChangeStateBtn = styled.button`
+  border: none;
+  border-radius: 10px;
+  padding: 3px 8px;
+  margin-left: 3px;
+  background-color: ${(props) => props.theme.componentColor};
+  color: ${(props) => props.theme.textColor};
+  font-size: 20px;
+
+  &:last-child {
+    padding: 1px 8px;
+  }
+`;
 
 function ToDo({ text, category, id }: IToDo) {
   const setToDos = useSetRecoilState(toDoState);
@@ -19,25 +45,38 @@ function ToDo({ text, category, id }: IToDo) {
       ];
     });
   };
+
+  const onDeleteClick = () => {
+    setToDos((oldToDos) => {
+      const targetIndex = oldToDos.findIndex((toDo) => toDo.id === id);
+
+      return [
+        ...oldToDos.slice(0, targetIndex),
+        ...oldToDos.slice(targetIndex + 1),
+      ];
+    });
+  };
+
   return (
-    <li>
-      <span>{text}</span>
+    <ToDoContatiner>
+      <ToDoText>{`> ${text}`}</ToDoText>
       {category !== Categories.DOING && (
-        <button name={Categories.DOING} onClick={onClick}>
+        <ChangeStateBtn name={Categories.DOING} onClick={onClick}>
           Doing
-        </button>
+        </ChangeStateBtn>
       )}
       {category !== Categories.TO_DO && (
-        <button name={Categories.TO_DO} onClick={onClick}>
+        <ChangeStateBtn name={Categories.TO_DO} onClick={onClick}>
           To Do
-        </button>
+        </ChangeStateBtn>
       )}
       {category !== Categories.DONE && (
-        <button name={Categories.DONE} onClick={onClick}>
+        <ChangeStateBtn name={Categories.DONE} onClick={onClick}>
           Done
-        </button>
+        </ChangeStateBtn>
       )}
-    </li>
+      <ChangeStateBtn onClick={onDeleteClick}>❌</ChangeStateBtn>
+    </ToDoContatiner>
   );
 }
 
