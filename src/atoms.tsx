@@ -1,4 +1,5 @@
 import { atom, selector } from "recoil";
+import { getToDos } from "./store";
 
 export enum Categories {
   "DONE" = "DONE",
@@ -19,7 +20,7 @@ export const categoryState = atom<Categories>({
 
 export const toDoState = atom<IToDo[]>({
   key: "toDo",
-  default: [],
+  default: getToDos(),
 });
 
 export const toDoSelector = selector({

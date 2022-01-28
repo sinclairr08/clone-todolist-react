@@ -1,7 +1,8 @@
 import React from "react";
-import { useSetRecoilState } from "recoil";
+import { useRecoilState } from "recoil";
 import styled from "styled-components";
 import { Categories, IToDo, toDoState } from "../atoms";
+import { storeToDos } from "../store";
 
 const ToDoContatiner = styled.li`
   display: flex;
@@ -29,7 +30,7 @@ const ChangeStateBtn = styled.button`
 `;
 
 function ToDo({ text, category, id }: IToDo) {
-  const setToDos = useSetRecoilState(toDoState);
+  const [toDos, setToDos] = useRecoilState(toDoState);
   const onClick = (event: React.MouseEvent<HTMLButtonElement>) => {
     const {
       currentTarget: { name },
@@ -56,6 +57,8 @@ function ToDo({ text, category, id }: IToDo) {
       ];
     });
   };
+
+  storeToDos(toDos);
 
   return (
     <ToDoContatiner>
