@@ -1,45 +1,84 @@
 import React from "react";
-import { useForm } from "react-hook-form";
-import {
-  atom,
-  useRecoilState,
-  useRecoilValue,
-  useSetRecoilState,
-} from "recoil";
+import { useRecoilState, useRecoilValue } from "recoil";
 import styled from "styled-components";
-import { Categories, categoryState, toDoSelector, toDoState } from "../atoms";
+import {
+  categoryState,
+  curCategoryState,
+  toDoSelector,
+  toDoState,
+} from "../atoms";
+import CreateCategory from "./CreateCategory";
 import CreateToDo from "./CreateToDo";
 import ToDo from "./ToDo";
 
-const ToDoListContainer = styled.div`
-  padding-left: 5px;
-`;
+const ToDoListContainer = styled.div``;
 
-const ToDoLisTitle = styled.h1`
+const ToDoListTitle = styled.h1`
   text-align: center;
   font-size: 48px;
 `;
 
+const ToDoListInput = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+`;
+
+const ToDoListGrid = styled.div`
+  display: grid;
+  grid-template-columns: 3fr 1fr 1fr;
+  align-items: center;
+  justify-items: center;
+  row-gap: 13px;
+
+  h2 {
+    color: #54bab9;
+  }
+`;
+
+const CategorySelector = styled.select`
+  position: absolute;
+  right: 75px;
+`;
+
 function ToDoList() {
   const toDos = useRecoilValue(toDoSelector);
-  const [category, setCategory] = useRecoilState(categoryState);
+  const [curCategory, setCurCategory] = useRecoilState(curCategoryState);
+  const categorys = useRecoilValue(categoryState);
   const onInput = (event: React.FormEvent<HTMLSelectElement>) => {
-    setCategory(event.currentTarget.value as any);
+    setCurCategory(event.currentTarget.value as any);
   };
 
   return (
     <ToDoListContainer>
-      <ToDoLisTitle>To Dos</ToDoLisTitle>
+      <ToDoListTitle>To Dos</ToDoListTitle>
       <hr />
-      <select value={category} onInput={onInput}>
-        <option value={Categories.TO_DO}>To Do</option>
-        <option value={Categories.DOING}>Doing</option>
-        <option value={Categories.DONE}>Done</option>
-      </select>
-      <CreateToDo />
-      {toDos?.map((toDo) => (
-        <ToDo key={toDo.id} {...toDo} />
-      ))}
+      <ToDoListInput>
+        <CreateCategory />
+      </ToDoListInput>
+      <hr />
+      <ToDoListInput>
+        <CreateToDo />
+        <CategorySelector value={curCategory} onInput={onInput}>
+          {categorys.map((category) => (
+            <option key={category} value={category}>
+              {category}
+            </option>
+          ))}
+        </CategorySelector>
+      </ToDoListInput>
+      <hr />
+
+      <ToDoListGrid>
+        <h2>Content</h2>
+        <h2>Remove</h2>
+        <h2>Move to</h2>
+
+        {toDos?.map((toDo) => (
+          <ToDo key={toDo.id} {...toDo} />
+        ))}
+      </ToDoListGrid>
     </ToDoListContainer>
   );
 }

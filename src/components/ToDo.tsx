@@ -1,43 +1,24 @@
 import React from "react";
-import { useRecoilState } from "recoil";
+import { useRecoilState, useRecoilValue } from "recoil";
 import styled from "styled-components";
-import { Categories, IToDo, toDoState } from "../atoms";
+import { categoryState, IToDo, toDoState } from "../atoms";
 import { storeToDos } from "../store";
-
-const ToDoContatiner = styled.li`
-  display: flex;
-  align-items: center;
-  margin: 5px 8px;
-`;
+import { RemoveBtn } from "./Button";
 
 const ToDoText = styled.span`
   font-size: 24px;
-  margin-right: 10px;
 `;
 
-const ChangeStateBtn = styled.button`
-  border: none;
-  border-radius: 10px;
-  padding: 3px 8px;
-  margin-left: 3px;
-  background-color: ${(props) => props.theme.componentColor};
-  color: ${(props) => props.theme.textColor};
-  font-size: 20px;
-
-  &:last-child {
-    padding: 1px 8px;
-  }
-`;
-
-function ToDo({ text, category, id }: IToDo) {
+function ToDo({ text, curCategory, id }: IToDo) {
   const [toDos, setToDos] = useRecoilState(toDoState);
-  const onClick = (event: React.MouseEvent<HTMLButtonElement>) => {
+  const categorys = useRecoilValue(categoryState);
+  const onInput = (event: React.FormEvent<HTMLSelectElement>) => {
     const {
-      currentTarget: { name },
+      currentTarget: { value },
     } = event;
     setToDos((oldToDos) => {
       const targetIndex = oldToDos.findIndex((toDo) => toDo.id === id);
-      const newToDo = { text, id, category: name as any };
+      const newToDo = { text, id, curCategory: value };
 
       return [
         ...oldToDos.slice(0, targetIndex),
@@ -61,25 +42,17 @@ function ToDo({ text, category, id }: IToDo) {
   storeToDos(toDos);
 
   return (
-    <ToDoContatiner>
-      <ToDoText>{`> ${text}`}</ToDoText>
-      {category !== Categories.DOING && (
-        <ChangeStateBtn name={Categories.DOING} onClick={onClick}>
-          Doing
-        </ChangeStateBtn>
-      )}
-      {category !== Categories.TO_DO && (
-        <ChangeStateBtn name={Categories.TO_DO} onClick={onClick}>
-          To Do
-        </ChangeStateBtn>
-      )}
-      {category !== Categories.DONE && (
-        <ChangeStateBtn name={Categories.DONE} onClick={onClick}>
-          Done
-        </ChangeStateBtn>
-      )}
-      <ChangeStateBtn onClick={onDeleteClick}>❌</ChangeStateBtn>
-    </ToDoContatiner>
+    <>
+      <ToDoText>{text.length > 22 ? text.slice(0, 20) + "..." : text}</ToDoText>
+      <RemoveBtn onClick={onDeleteClick}>X</RemoveBtn>
+      <select onInput={onInput} defaultValue={curCategory}>
+        {categorys.map((category) => (
+          <option key={category} value={category}>
+            {category}
+          </option>
+        ))}
+      </select>
+    </>
   );
 }
 
